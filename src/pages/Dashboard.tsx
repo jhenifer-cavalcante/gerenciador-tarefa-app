@@ -1,18 +1,15 @@
 import { useState } from "react"
 import { Plus, Eye, Pencil, Trash2, CheckCircle, Clock } from "lucide-react"
-
-interface ListaTarefa {
-  id: number
-  nome: string
-  tarefas: number
-  status: "concluido" | "andamento"
-}
+import type { ListaTarefaInterface } from "../interfaces/lista_tarefa"
+import NovaTarefaForm from "../components/NovaTarefaForm";
 
 export default function Dashboard() {
-  const [listas, setListas] = useState<ListaTarefa[]>([
-    { id: 1, nome: "Trabalho", tarefas: 12, status: "andamento" },
-    { id: 2, nome: "Pessoal", tarefas: 8, status: "concluido" },
-    { id: 3, nome: "Estudos", tarefas: 5, status: "andamento" },
+  const [mostrarForm, setMostrarForm] = useState(false);
+
+  const [listas, setListas] = useState<ListaTarefaInterface[]>([
+    { id: 1, nome: "Trabalho", tarefas: 12, status: "EM ANDAMENTO" },
+    { id: 2, nome: "Pessoal", tarefas: 8, status: "CONCLUIDA" },
+    { id: 3, nome: "Estudos", tarefas: 5, status: "EM ANDAMENTO" },
   ])
 
   function handleExcluir(id: number) {
@@ -21,15 +18,21 @@ export default function Dashboard() {
 
   return (
     <div>
-      {/* Cabeçalho */}
+      {/* cabeçalho */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-slate-800">Minhas Listas de Tarefas</h1>
-        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+        <button type="submit" className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition" onClick={() => setMostrarForm(true)}>
           <Plus size={18} /> Nova Lista
         </button>
       </div>
 
-      {/* Grid de Listas */}
+      {/* mostrar model do cadastro de tarefa */}
+      {mostrarForm && (
+        <NovaTarefaForm onClose={() => setMostrarForm(false)} />
+      )}
+
+
+      {/* grid de Listas */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {listas.map((lista) => (
           <div
@@ -38,7 +41,7 @@ export default function Dashboard() {
           >
             <div className="flex justify-between items-center mb-3">
               <h2 className="text-xl font-semibold">{lista.nome}</h2>
-              {lista.status === "concluido" ? (
+              {lista.status === "CONCLUIDA" ? (
                 <CheckCircle className="text-green-500" size={20} />
               ) : (
                 <Clock className="text-yellow-500" size={20} />

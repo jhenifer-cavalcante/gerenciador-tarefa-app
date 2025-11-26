@@ -2,9 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import Navbar from "./components/Navbar"
 import Dashboard from "./pages/Dashboard"
 import Category from "./pages/Category"
-// import Tags from "./pages/Tags"
-// import Recompensas from "./pages/Recompensas"
-// import Impedimentos from "./pages/Impedimentos"
+import { Toaster } from "react-hot-toast";
 
 export default function App() {
   return (
@@ -12,6 +10,7 @@ export default function App() {
       <div className="flex">
         <Navbar />
         <main className="flex-1 p-6 bg-slate-100 min-h-screen">
+          <Toaster position="top-right" />
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/categorias" element={<Category />} />
