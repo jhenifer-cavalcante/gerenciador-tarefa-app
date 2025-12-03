@@ -1,10 +1,10 @@
 import { useState } from "react"
-import { Menu, X, ChevronDown } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { Link } from "react-router-dom"
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
-  const [cadastroOpen, setCadastroOpen] = useState(false)
+  // const [cadastroOpen, setCadastroOpen] = useState(false)
 
   return (
     <nav className="bg-slate-900 text-white w-64 min-h-screen p-4 flex flex-col">
@@ -23,7 +23,7 @@ export default function Navbar() {
         </li>
 
         {/* Menu Cadastro */}
-        <li>
+        {/* <li>
           <button
             onClick={() => setCadastroOpen(!cadastroOpen)}
             className="w-full flex items-center justify-between px-2 py-2 rounded hover:bg-slate-700"
@@ -59,7 +59,7 @@ export default function Navbar() {
               </li>
             </ul>
           )}
-        </li>
+        </li> */}
       </ul>
     </nav>
   )

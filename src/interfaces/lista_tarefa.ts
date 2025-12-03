@@ -1,6 +1,5 @@
 export interface ListaTarefaInterface {
-  id: number
-  nome: string
-  tarefas: number
+  numero: number,
+  titulo: string,
   status: 'PENDENTE' | 'EM ANDAMENTO' |'CONCLUIDA'
 }

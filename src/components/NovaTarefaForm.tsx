@@ -1,12 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { TarefaInterface } from "../interfaces/tarefa";
 import toast from "react-hot-toast";
+import { formatarData } from "../util/formatDate";
 
 type Props = {
   onClose: () => void;
+  reloadTarefas: () => void;
+  buttonType: string;
+  numeroTarefa: number;
 };
 
-export default function NovaTarefaForm({ onClose }: Props) {
+const defaultTarefa: TarefaInterface = {
+  titulo: "",
+  descricao: "",
+  status: "PENDENTE",
+  prazo: "",
+  frequencia: "UNICA",
+  nivel_energia_fisica: 1,
+  nivel_energia_mental: 1,
+  num_categoria: 1,
+  num_recompensa: 1,
+  sub_tarefas: []
+}
+
+export default function NovaTarefaForm({ onClose , reloadTarefas, buttonType, numeroTarefa}: Props) {
+    const [loadedTarefa, setLoadedTarefa] = useState(false);
     const [valueF, setValueF] = useState(2);
     const [valueM, setValueM] = useState(2);
 
@@ -14,17 +32,7 @@ export default function NovaTarefaForm({ onClose }: Props) {
     const percentF = ((valueF - 1) / 4) * 100;
     const percentM = ((valueM - 1) / 4) * 100;
 
-    const [novaTarefa, setNovaTarefa] = useState<TarefaInterface>({
-        titulo: "",
-        descricao: "",
-        status: "PENDENTE",
-        prazo: "",
-        frequencia: "UNICA",
-        nivel_energia_fisica: 2,
-        nivel_energia_mental: 2,
-        num_categoria: 1,
-        num_recompensa: 1
-    });
+    const [novaTarefa, setNovaTarefa] = useState<TarefaInterface>(defaultTarefa);
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
       const name = e.target.name;
@@ -53,24 +61,60 @@ export default function NovaTarefaForm({ onClose }: Props) {
     async function handleSubmit(e: React.FormEvent) {
       e.preventDefault();
 
-      console.log("Payload enviado:", novaTarefa);
-
       try {
-        await fetch("http://localhost:3333/v1/api/tarefas/criar", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(novaTarefa),
-        }).then((value: Response)=>{
-            toast.success("", )
-        });
+          if(buttonType == "Salvar"){
+            await fetch("http://localhost:3333/v1/api/tarefas/criar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(novaTarefa),
+          }).then(()=>{
+              toast.success("Tarefa criada!");
+              onClose();
+              reloadTarefas();
+          });
+        }else{
+          console.log(novaTarefa)
+          await fetch(`http://localhost:3333/v1/api/tarefas/${numeroTarefa}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(novaTarefa),
+          }).then(()=>{
+              toast.success("Tarefa atualizada!");
+              onClose();
+              reloadTarefas();
+          });
+        }
       } catch(error) {
-        toast.error("Erro ao cadastrar");
+          console.log(error);
+          toast.error("Erro ao salvar.");
       } 
     }
+
+    async function loadTarefa(){
+      const resp = await fetch(`http://localhost:3333/v1/api/tarefas/${numeroTarefa}`,{
+        method: "GET"
+      });
+      const json = await resp.json();
+      json.data.prazo = await formatarData(json.data.prazo);
+      json.data.nivelEnergiaFisica=parseInt(json.data.nivelEnergiaFisica)+1;
+      json.data.nivelEnergiaMental=parseInt(json.data.nivelEnergiaMental)+1;
+
+      novaTarefa.sub_tarefas = json.data.sub_tarefas;
+      setNovaTarefa(json.data);
+      setValueF(json.data.nivelEnergiaFisica);
+      setValueM(json.data.nivelEnergiaMental);
+
+      setLoadedTarefa(true);
+    }
+
+    useEffect(()=>{
+      if(numeroTarefa>0 && !loadedTarefa)  
+        loadTarefa();
+    })
     
   return (
     // Fundo escuro
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" >
       {/* Container branco */}
       <div className="bg-white p-6 rounded-xl w-[400px] shadow-lg">
         <h2 className="text-xl font-semibold mb-4">Criar Nova Tarefa</h2>
@@ -108,7 +152,7 @@ export default function NovaTarefaForm({ onClose }: Props) {
             <option value="DIARIA">Diariamente</option>
             <option value="SEMANAL">Semanalmente</option>
             <option value="MENSAL">Mensalmente</option>
-            <option value="UNICA" selected>Uma vez</option>
+            <option value="UNICA">Uma vez</option>
           </select>
 
           <label htmlFor="nivel_energia_fisica">Nível de energia física requerida [1 a 4]:</label>
@@ -157,7 +201,7 @@ export default function NovaTarefaForm({ onClose }: Props) {
             <button
               type="submit"
               className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
-            >Salvar
+            >{ buttonType }
             </button>
           </div>
         </form>

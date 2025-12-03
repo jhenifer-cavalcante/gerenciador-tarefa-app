@@ -1,3 +1,5 @@
+import type { SubTarefaInterface } from "./sub_tarefa";
+
 export interface TarefaInterface{
     numero?: number,
     titulo?: string,
@@ -10,5 +12,6 @@ export interface TarefaInterface{
     num_categoria?: number,
     num_recompensa?: number,
     criado_por?: number,
+    sub_tarefas?: SubTarefaInterface[],
     ativo?: boolean
 }
