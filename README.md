@@ -9,3 +9,9 @@ npm install // adicione a tag --force, se necessário
 ```typescript
 npm run dev
 ```
+
+## 3º passo: acessar URL no navegador:
+
+```
+http://localhost:5173
+```
